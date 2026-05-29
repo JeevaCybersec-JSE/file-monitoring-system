@@ -11,16 +11,16 @@ echo " File Monitoring Started..." | tee -a logs.txt
 echo " Started at: $(date)" | tee -a logs.txt
 echo "==================================" | tee -a logs.txt
 
-# Initial Scan
-find monitored_folder -type f | sort > old_state.txt
+# Initial Scan using SHA256 hashes
+find . -type f ! -name "old_state.txt" ! -name "new_state.txt" ! -name "logs.txt" -exec sha256sum {} \; | sort > old_state.txt
 
 # Continuous Monitoring
 while true
 do
     # Current Scan
-    find monitored_folder -type f | sort > new_state.txt
+    find . -type f ! -name "old_state.txt" ! -name "new_state.txt" ! -name "logs.txt" -exec sha256sum {} \; | sort > new_state.txt
 
-    # Compare files
+    # Compare old and new states
     changes=$(diff old_state.txt new_state.txt)
 
     # If changes detected
